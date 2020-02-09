@@ -24,6 +24,9 @@ social:
 - icon: envelope
   icon_pack: fas
   link: '#contact'
+- icon: linkedin
+  icon_pack: fab
+  link: https://www.linkedin.com/in/stuart-watt-4a6a03199/
 #- icon: twitter
 #  icon_pack: fab
 #  link: https://twitter.com/GeorgeCushen
