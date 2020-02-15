@@ -5,7 +5,7 @@ bio: My interests include data science, the mathematical sciences along with mod
 education:
   courses:
   - course: MSc in Data Science
-    institution: Stanford University
+    institution: Robert Gordon University
     year: 2019 - 2020
   - course: BSc Hons in Physics
     institution: University of Aberdeen
