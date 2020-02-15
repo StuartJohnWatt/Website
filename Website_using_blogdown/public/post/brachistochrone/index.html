@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="generator" content="Source Themes Academic 4.7.0">
+
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+  
+  
+    
+  
+  <meta name="description" content="Consider a point \(P_1\) alongside another point \(P_2\) which lies below, but not directly below it. Which path allows a bead initially at rest, to slide frictionlessly from \(P_1\) to \(P_2\) with the least possible time \(t\) when subject to a constant downward gravitational force? This is known as the Brachistochrone problem and it is famous in the development of calculus.
+Figure 1: Simulated motion for different paths (time not to scale)The solution to this problem is the Brachistochrone curve, which was found to be a cycloid.">
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/brachistochrone/">
+
+  
+
+
+  
+  
+  
+  <meta name="theme-color" content="#2962ff">
+  
+
+  
+  
+  
+  <script src="/js/mathjax-config.js"></script>
+  
+
+  
+  
+  
+  
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.6/css/academicons.min.css" integrity="sha256-uFVgMKfistnJAfoCUQigIl+JfUaP47GrRKjf6CTPVmw=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-1/css/all.min.css" integrity="sha256-4w9DunooKSr3MFXHXWyFER38WmPdm361bQS/2KUWZbU=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/github.min.css" crossorigin="anonymous" title="hl-light">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" disabled>
+        
+      
+    
+
+    
+
+    
+
+    
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.1.2/lazysizes.min.js" integrity="sha256-Md1qLToewPeKjfAHU1zyPwOutccPAm5tahnaw7Osw0A=" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+    
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+
+      
+      
+
+      
+    
+
+  
+
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700%7CRoboto:400,400italic,700%7CRoboto+Mono&display=swap">
+  
+
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/academic.css">
+
+  
+
+
+
+
+  
+
+
+  
+
+  <link rel="manifest" href="/index.webmanifest">
+  <link rel="icon" type="image/png" href="/images/icon_hu531ab909793e623891d4196229f14140_12629_32x32_fill_lanczos_center_2.png">
+  <link rel="apple-touch-icon" type="image/png" href="/images/icon_hu531ab909793e623891d4196229f14140_12629_192x192_fill_lanczos_center_2.png">
+
+  <link rel="canonical" href="/post/brachistochrone/">
+
+  
+  
+  
+  
+  
+    
+    
+  
+  
+  <meta property="twitter:card" content="summary">
+  
+  <meta property="og:site_name" content="Stuart John Watt">
+  <meta property="og:url" content="/post/brachistochrone/">
+  <meta property="og:title" content="The Brachistochrone | Stuart John Watt">
+  <meta property="og:description" content="Consider a point \(P_1\) alongside another point \(P_2\) which lies below, but not directly below it. Which path allows a bead initially at rest, to slide frictionlessly from \(P_1\) to \(P_2\) with the least possible time \(t\) when subject to a constant downward gravitational force? This is known as the Brachistochrone problem and it is famous in the development of calculus.
+Figure 1: Simulated motion for different paths (time not to scale)The solution to this problem is the Brachistochrone curve, which was found to be a cycloid."><meta property="og:image" content="img/map[gravatar:%!s(bool=false) shape:circle]">
+  <meta property="twitter:image" content="img/map[gravatar:%!s(bool=false) shape:circle]"><meta property="og:locale" content="en-us">
+  
+    
+      <meta property="article:published_time" content="2020-02-15T00:00:00&#43;00:00">
+    
+    <meta property="article:modified_time" content="2020-02-15T00:00:00&#43;00:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/brachistochrone/"
+  },
+  "headline": "The Brachistochrone",
+  
+  "datePublished": "2020-02-15T00:00:00Z",
+  "dateModified": "2020-02-15T00:00:00Z",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Stuart John Watt"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Stuart John Watt",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "img//"
+    }
+  },
+  "description": "Consider a point \\(P_1\\) alongside another point \\(P_2\\) which lies below, but not directly below it. Which path allows a bead initially at rest, to slide frictionlessly from \\(P_1\\) to \\(P_2\\) with the least possible time \\(t\\) when subject to a constant downward gravitational force? This is known as the Brachistochrone problem and it is famous in the development of calculus.\n\rFigure 1: Simulated motion for different paths (time not to scale)\r\rThe solution to this problem is the Brachistochrone curve, which was found to be a cycloid."
+}
+</script>
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  <title>The Brachistochrone | Stuart John Watt</title>
+
+</head>
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" >
+
+  <aside class="search-results" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search">
+        
+      </div>
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+  
+
+
+
+
+
+
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="/">Stuart John Watt</a>
+    </div>
+    
+
+    
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    
+
+    
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="/">Stuart John Watt</a>
+    </div>
+    
+
+    
+    
+    <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+      
+      <ul class="navbar-nav d-md-inline-flex">
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#about"><span>About</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#posts"><span>Posts</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+          
+          
+          
+            
+          
+          
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/#contact"><span>Contact</span></a>
+        </li>
+
+        
+        
+
+        
+
+        
+        
+        
+          
+        
+
+        
+        
+        
+        
+        
+        
+
+        <li class="nav-item">
+          <a class="nav-link " href="/files/cv.pdf"><span>CV</span></a>
+        </li>
+
+        
+        
+
+      
+
+        
+      </ul>
+    </div>
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+      
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+      <li class="nav-item">
+        <a class="nav-link js-dark-toggle" href="#"><i class="fas fa-moon" aria-hidden="true"></i></a>
+      </li>
+      
+
+      
+
+    </ul>
+
+  </div>
+</nav>
+
+
+  <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>The Brachistochrone</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+    
+    Feb 15, 2020
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  
+
+  
+  
+
+</div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      
+
+
+<p>Consider a point <span class="math inline">\(P_1\)</span> alongside another point <span class="math inline">\(P_2\)</span> which lies below, but not directly below it. Which path allows a bead initially at rest, to slide frictionlessly from <span class="math inline">\(P_1\)</span> to <span class="math inline">\(P_2\)</span> with the least possible time <span class="math inline">\(t\)</span> when subject to a constant downward gravitational force? This is known as the <a href="http://mathworld.wolfram.com/BrachistochroneProblem.html">Brachistochrone problem</a> and it is famous in the development of calculus.</p>
+<div class="figure" style="text-align: center"><span id="fig:Animation"></span>
+<img src="/post/2020-02-09-the-brachistochrone_files/figure-html/Animation-1.gif" alt="Simulated motion for different paths (time not to scale)"  />
+<p class="caption">
+Figure 1: Simulated motion for different paths (time not to scale)
+</p>
+</div>
+<p>The solution to this problem is the Brachistochrone curve, which was found to be a cycloid. A cycloid is a path which is described by a point on a circle rolling along a flat surface.</p>
+<div class="figure" style="text-align: center"><span id="fig:CycloidPlot"></span>
+<img src="/post/2020-02-09-the-brachistochrone_files/figure-html/CycloidPlot-1.gif" alt="Cycloid traced by its generating circle. The Brachistochrone curve has the cusps pointed upward."  />
+<p class="caption">
+Figure 2: Cycloid traced by its generating circle. The Brachistochrone curve has the cusps pointed upward.
+</p>
+</div>
+<p>I was interested in investigating this numerically, so I started to write a script simulating a bead falling down a path made of <span class="math inline">\(N\)</span> line segments. Details are found below, but in summary the simulation was successful with the predicted time quickly converging with increasing number of line segments <span class="math inline">\(N\)</span>.</p>
+<div class="figure" style="text-align: center"><span id="fig:Convergenceplot"></span>
+<img src="/post/2020-02-09-the-brachistochrone_files/figure-html/Convergenceplot-1.png" alt="Simulated time (in seconds) taken for bead to travel across Brachistochrone path approximated with $N$ line segments between $P_1=(0,0.3)$ and $P_2=(1,0)$ in meters." width="65%" />
+<p class="caption">
+Figure 3: Simulated time (in seconds) taken for bead to travel across Brachistochrone path approximated with <span class="math inline">\(N\)</span> line segments between <span class="math inline">\(P_1=(0,0.3)\)</span> and <span class="math inline">\(P_2=(1,0)\)</span> in meters.
+</p>
+</div>
+<p>Since the Brachistochrone problem is about finding a global minima an approximate solution should in principle be found via an optimisation algorithm. I used an <a href="https://en.wikipedia.org/wiki/Limited-memory_BFGS#L-BFGS-B">optimisation algorithm</a> to minimise the simulated travel time by varying the <span class="math inline">\(y\)</span>-coordinates of an intermediate set of points initially making up a straight line segment from <span class="math inline">\(P_1\)</span> to <span class="math inline">\(P_2\)</span>. The <span class="math inline">\(x\)</span>-coordinates of these points remained fixed at equal values to the parametrisation of the known Brachistochrone curve. By recording the <span class="math inline">\(y\)</span>-values for every function call the following animation was made.</p>
+<div class="figure" style="text-align: center"><span id="fig:ConvergenceAnimation"></span>
+<img src="/post/2020-02-09-the-brachistochrone_files/figure-html/ConvergenceAnimation-1.gif" alt="Progressive paths considered by optimisation method when finding fastest path of descent (shown in black) against known solution (shown in red)."  />
+<p class="caption">
+Figure 4: Progressive paths considered by optimisation method when finding fastest path of descent (shown in black) against known solution (shown in red).
+</p>
+</div>
+<p>Looks good! So we can indeed find an approximate solution numerically without prior knowledge.</p>
+<div id="code" class="section level2">
+<h2>Code</h2>
+<p>For the Brachistochrone trajectory, we use the set of parametric equations for a cycloid:
+<span class="math display">\[x(\theta) = x_0+R(\theta-\sin\theta),\quad y(\theta)=y_0+R(\cos\theta-1).\]</span>
+Note that the <span class="math inline">\(y(\theta)\)</span> is in a slightly different form than usual. I prefer having my <span class="math inline">\(y\)</span> axis pointing vertically upwards (and hence, against gravity), so I use these equations are for an “upside down” cycloid.</p>
+<p>We need to find the interval to vary <span class="math inline">\(\theta\)</span> over, along with <span class="math inline">\(x_0\)</span>, <span class="math inline">\(y_0\)</span> and <span class="math inline">\(R\)</span>. Setting an initial <span class="math inline">\(\theta_0 = 0\)</span> gives <span class="math inline">\(x=x_0\)</span> and <span class="math inline">\(y=y_0\)</span>: these are components of <span class="math inline">\(P_1\)</span>. Dividing one parametric equation by the other before rearranging, we obtain
+<span class="math display">\[\frac{x(\theta)-x_0}{y(\theta)-y_0}-\frac{\theta-\sin\theta}{\cos\theta-1}=0.\]</span>
+We can solve this numerically at <span class="math inline">\(P_2\)</span> to find the upper range of the parameter value <span class="math inline">\(\theta_1\)</span>. Finally, <span class="math inline">\(R\)</span> can be found by simple substitution.</p>
+<p>I create a function to obtain Brachistochrone paths approximated over <span class="math inline">\(N\)</span> segments with boundary conditions at the coordinates <span class="math inline">\(P_1\)</span> and <span class="math inline">\(P_2\)</span>. This is returned in a data frame with a time column containing missing values. I also create two similar functions for straight and polygonal paths.</p>
+<pre class="r"><code>getBrachTraj &lt;- function(P1, P2, N){
+  theta.i &lt;- 0 
+  theta.f &lt;- uniroot(function(theta) (P2[1]-P1[1])/(P2[2]-P1[2]) - (theta-sin(theta))/(cos(theta)-1),
+                     interval = c(10e-6, 2*pi),  # we don&#39;t use 0 to avoid devision by zero
+                     extendInt = c(&quot;upX&quot;),
+                     tol = 10e-10)$root
+  theta &lt;- seq(theta.i, theta.f, length.out = N+1)
+  R &lt;- (P2[2]-P1[2])/(cos(theta.f)-1)
+  data.frame(x = P1[1]+R*(theta-sin(theta)),
+             y = P1[2]+R*(cos(theta)-1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getLinTraj &lt;- function(P1, P2, N){
+  data.frame(x = seq(from = P1[1], to = P2[1], length.out = N+1),
+             y = seq(from = P1[2], to = P2[2], length.out = N+1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getPolygonalTraj &lt;- function(P1,P2, N){
+  h &lt;- abs(P2[2]-P1[2])
+  L &lt;- abs(P2[1]-P1[1])
+  n1 &lt;- ceiling(h/(h+L)*(N+1))
+  n2 &lt;- N+2-n1
+  data.frame(x = c(rep(P1[1], times = n1),
+                   seq(P1[1], P2[1], length.out = n2)[2:n2]),
+             y = c(seq(P1[2], P2[2], length.out = n1),
+                   rep(P2[2], times = n2)[2:n2]),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}</code></pre>
+<p>We can now create a function that takes our trajectory data frame from above and fills the velocity, acceleration and time attributes. Here we just have <span class="math inline">\(N\)</span> cases of simple inclined plane problems. By finding the segment distances and the accelerations dependent on the slope of the segments, we can calculate speeds of the bead entering and exiting each segment, thus allowing us to calculate the progress of time and store it in our data frame.</p>
+<pre class="r"><code>motion &lt;- function(traj){
+  if(any(traj$y[2:nrow(traj)] &gt;= traj$y[1])) stop(&quot;Improper path&quot;)
+  N &lt;- nrow(traj)-1
+  a &lt;- rep(NA, N+1)
+  g &lt;- 9.81
+  traj$t[1] &lt;- 0
+  traj$v[1] &lt;- 0
+  segLengths &lt;- sqrt(diff(traj$x)^2 + diff(traj$y)^2)
+  traj$a[1:(nrow(traj)-1)] &lt;- g*(-1)*diff(traj$y) / segLengths
+  
+  getSegTime &lt;- function(d,v0,a){
+    if(a == 0){
+      return(d/v0)
+    }else{
+      return((sqrt(v0^2+2*a*d)-v0)/a)
+    }
+  }
+  
+  for(ii in 2:nrow(traj)){
+    dt &lt;- getSegTime(d = segLengths[ii-1], v0 = traj$v[ii-1],
+                     a = traj$a[ii-1])
+    traj$t[ii] &lt;- traj$t[ii-1] + dt
+    traj$v[ii] &lt;- traj$v[ii-1] + traj$a[ii-1]*dt
+  }
+  return(traj)
+}</code></pre>
+<p>Simulation for our three paths is now possible.</p>
+<pre class="r"><code>N &lt;- 50
+P1 &lt;- c(0,0.3)
+P2 &lt;- c(1,0)
+
+lin.motion &lt;- motion(getLinTraj(P1,P2,N))
+brach.motion &lt;- motion(getBrachTraj(P1,P2,N))
+polygon.motion &lt;- motion(getPolygonalTraj(P1,P2,N))</code></pre>
+<p>For our animation we have a slight problem: each of these data frames will almost certainly each have a set of unique <span class="math inline">\(t\)</span> values (ignoring <span class="math inline">\(t=0\)</span>). This means that for a given moment in time we do not know their positions. We can solve this problem by writing a function that takes a motion data frame along with a vector of <span class="math inline">\(t\)</span> values and outputs an updated data frame containing rows with <span class="math inline">\(t\)</span>. Since our simulation involves a collection of small inclined planes, we can calculate the required information for any time <span class="math inline">\(t&#39;\)</span> using any data with the closest <span class="math inline">\(t\)</span> before and after.</p>
+<pre class="r"><code>getStates &lt;- function(t,traj){
+  N &lt;- nrow(traj)-1
+  n.new &lt;- length(t)
+  idx &lt;- findInterval(t, traj$t)
+  newVal &lt;- data.frame(x = rep(NA, times = n.new),
+                       y = rep(NA, times = n.new),
+                       v = rep(NA, times = n.new),
+                       a = rep(NA, times = n.new),
+                       t = t)
+  for(ii in 1:n.new){
+    if(idx[ii] == N+1){
+      newVal$x[ii] &lt;- traj$x[N+1]
+      newVal$y[ii] &lt;- traj$y[N+1]
+      newVal$v[ii] &lt;- 0
+      newVal$a[ii] &lt;- 0
+    }else{
+      t0 &lt;- traj$t[idx[ii]]
+      dt &lt;- t[ii]-t0
+      ds &lt;- traj$v[idx[ii]]*dt + 0.5*traj$a[idx[ii]]*dt^2   # s = u*t + 1/2*a*t^2
+      orig.segLength &lt;- sqrt(diff(traj$x[idx[ii]:(idx[ii]+1)])^2+diff(traj$y[idx[ii]:(idx[ii]+1)])^2)
+      newVal$x[ii] &lt;- traj$x[idx[ii]] + ds*(traj$x[idx[ii]+1]-traj$x[idx[ii]])/orig.segLength
+      newVal$y[ii] &lt;- traj$y[idx[ii]] + ds*(traj$y[idx[ii]+1]-traj$y[idx[ii]])/orig.segLength
+      newVal$v[ii] &lt;- traj$v[idx[ii]] + traj$a[idx[ii]]*dt
+      newVal$a[ii] &lt;- traj$a[idx[ii]]
+    }
+  }
+  out.df &lt;- rbind(traj, newVal)
+  return(out.df[order(out.df$t),])
+}
+
+times &lt;- c(lin.motion$t, brach.motion$t, polygon.motion$t)
+
+lin.motion &lt;- getStates(t = times, lin.motion)
+brach.motion &lt;- getStates(t = times, brach.motion)
+polygon.motion &lt;- getStates(t = times, polygon.motion)</code></pre>
+<p>Now we can assemble the data and produce our animation:</p>
+<pre class="r"><code>library(tidyverse)
+library(gganimate)
+library(gifski)
+
+lin.motion$name &lt;- &quot;Linear&quot;
+brach.motion$name &lt;- &quot;Brachistochrone&quot;
+polygon.motion$name &lt;- &quot;Polygon&quot;
+
+motion.data &lt;- rbind(lin.motion, brach.motion, polygon.motion)
+
+anim &lt;- ggplot() +
+  geom_path(data = select(motion.data, x, y, name), aes(x, y, colour = name)) +
+  geom_point(data = motion.data, aes(x,y, fill = name), shape = 21, colour = &quot;black&quot;,
+             size = 4) +
+  guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
+  coord_fixed() +
+  transition_time(t) +
+  shadow_wake(wake_length = 0.1)
+anim &lt;- animate(anim, renderer = gifski_renderer(),
+                duration = 3, end_pause = 25, fps = 30, res = 100,
+                width = 650, height = 250)</code></pre>
+<p>Now, to perform the optimisation, we first need to set up our Brachistochrone path.</p>
+<pre class="r"><code>P1 &lt;- c(0,0.3)
+P2 &lt;- c(1,0)
+N &lt;- 30       # Number of line segments
+
+brach.path &lt;- motion(getBrachTraj(P1,P2,N))
+brach.path$t &lt;- NULL
+brach.path$name &lt;- NULL
+brach.path$v &lt;- NULL
+brach.path$a &lt;- NULL</code></pre>
+<p>We create a matrix to store the intermediate <span class="math inline">\(y\)</span>-values as rows, along with a wrapper function that takes these along with the <span class="math inline">\(x\)</span>-values and end points of our path before returning the total time taken. Every time this function is called, the inserted <span class="math inline">\(y\)</span>-values are stored into our matrix.</p>
+<pre class="r"><code>max.iter &lt;- 100000L # maximum number of iterations for convergence method
+intermed.y.count &lt;- 0L
+intermed.y &lt;- matrix(as.numeric(NA), ncol = N+1, nrow = max.iter)
+
+getTime &lt;- function(intermed.heights, inx, P1, P2){
+  intermed.y.count &lt;&lt;- intermed.y.count + 1L
+  intermed.y[intermed.y.count,] &lt;&lt;- c(P1[2],intermed.heights,P2[2])
+  N &lt;- length(intermed.heights)+1
+  traj &lt;- data.frame(x = inx,
+                     y = intermed.y[intermed.y.count,],
+                     v = rep(NA, times = N+1),
+                     a = rep(NA, times = N+1),
+                     t = rep(NA, times = N+1))
+  return(motion(traj)$t[nrow(traj)])
+}</code></pre>
+<p>Now we may apply the optimisation function.</p>
+<pre class="r"><code>set.seed(1) # for reproducability
+minima &lt;- optim(par = seq(P1[2],P2[2], length.out = N+1)[2:N],
+                fn = getTime,
+                lower = rep(-5, times = N-1),
+                upper = rep(P1[2]-1e-5, times = N-1),
+                method = &quot;L-BFGS-B&quot;,
+                inx = brach.path$x,
+                P1 = P1,
+                P2 = P2)</code></pre>
+<p>Finally, we can create the animation:</p>
+<pre class="r"><code>y &lt;- as.vector(intermed.y[1:intermed.y.count,])
+x &lt;- rep(brach.path$x,
+         times = rep(intermed.y.count, N+1))
+iter &lt;- rep(1:intermed.y.count, 
+            times = N+1)
+plot.data &lt;- data.frame(x = x, y = y, iter = iter)
+
+anim.optim &lt;- ggplot() +
+  geom_path(data = brach.path, aes(x = x, y = y), colour = &quot;red&quot;) +
+  geom_point(data = brach.path, aes(x = x, y = y), colour = &quot;red&quot;) +
+  geom_path(data = plot.data, aes(x = x, y = y)) +
+  geom_point(data = plot.data, aes(x = x, y = y)) +
+  coord_fixed() +
+  ylim(min(c(brach.path$y,plot.data$y)), max(c(brach.path$y,plot.data$y))) +
+  transition_time(iter)
+anim.optim &lt;- animate(anim.optim, renderer = gifski_renderer(),
+                      duration = 10, end_pause = 5, fps = 20, res = 100,
+                      width = 800, height = 400)</code></pre>
+</div>
+
+    </div>
+
+    
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tags/physics/">Physics</a>
+  
+  <a class="badge badge-light" href="/tags/simulation/">Simulation</a>
+  
+  <a class="badge badge-light" href="/tags/optimisation/">Optimisation</a>
+  
+  <a class="badge badge-light" href="/tags/animation/">Animation</a>
+  
+  <a class="badge badge-light" href="/tags/r/">R</a>
+  
+</div>
+
+
+
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/brachistochrone/&amp;text=The%20Brachistochrone" target="_blank" rel="noopener" class="share-btn-twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/brachistochrone/&amp;t=The%20Brachistochrone" target="_blank" rel="noopener" class="share-btn-facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=The%20Brachistochrone&amp;body=/post/brachistochrone/" target="_blank" rel="noopener" class="share-btn-email">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/brachistochrone/&amp;title=The%20Brachistochrone" target="_blank" rel="noopener" class="share-btn-linkedin">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://web.whatsapp.com/send?text=The%20Brachistochrone%20/post/brachistochrone/" target="_blank" rel="noopener" class="share-btn-whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/brachistochrone/&amp;title=The%20Brachistochrone" target="_blank" rel="noopener" class="share-btn-weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+
+
+
+
+
+
+
+
+
+<section id="comments">
+  
+    <div id="commento"></div>
+
+<script src="https://cdn.commento.io/js/commento.js" defer></script>
+
+  
+</section>
+
+
+
+
+
+
+  
+  
+
+
+
+  </div>
+</article>
+
+      
+
+    
+    
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js" integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+
+      
+
+      
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/highlight.min.js" integrity="sha256-1zu+3BnLYV9LdiY85uXMzii3bdrkelyp37e0ZyTAQh0=" crossorigin="anonymous"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.10/languages/r.min.js"></script>
+        
+      
+
+    
+
+    
+    
+
+    
+    
+    <script>const code_highlighting = true;</script>
+    
+
+    
+    
+    
+    
+    
+    
+    <script>
+      const search_config = {"indexURI":"/index.json","minLength":1,"threshold":0.3};
+      const i18n = {"no_results":"No results found","placeholder":"Search...","results":"results found"};
+      const content_type = {
+        'post': "Posts",
+        'project': "Projects",
+        'publication' : "Publications",
+        'talk' : "Talks"
+        };
+    </script>
+    
+
+    
+    
+
+    
+    
+    <script id="search-hit-fuse-template" type="text/x-template">
+      <div class="search-hit" id="summary-{{key}}">
+      <div class="search-hit-content">
+        <div class="search-hit-name">
+          <a href="{{relpermalink}}">{{title}}</a>
+          <div class="article-metadata search-hit-type">{{type}}</div>
+          <p class="search-hit-description">{{snippet}}</p>
+        </div>
+      </div>
+      </div>
+    </script>
+    
+
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.2.1/fuse.min.js" integrity="sha256-VzgmKYmhsGNNN4Ph1kMW+BjoYJM2jV5i4IlFoeZA9XI=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+    
+
+    
+    
+
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      
+    
+    
+    
+    
+    <script src="/js/academic.min.0630fec5958cb075a5a38f042b3ddde6.js"></script>
+
+    
+
+
+
+
+
+
+  
+  
+  <div class="container">
+    <footer class="site-footer">
+  
+  <p class="powered-by">
+    
+      <a href="/privacy/">Privacy Policy</a>
+    
+    
+       &middot; 
+      <a href="/terms/">Terms</a>
+    
+  </p>
+  
+
+  <p class="powered-by">
+    
+
+    Powered by the
+    <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+    <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+    
+    <span class="float-right" aria-hidden="true">
+      <a href="#" class="back-to-top">
+        <span class="button_icon">
+          <i class="fas fa-chevron-up fa-2x"></i>
+        </span>
+      </a>
+    </span>
+    
+  </p>
+</footer>
+
+  </div>
+  
+
+  
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

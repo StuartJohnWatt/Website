@@ -1,0 +1,506 @@
+---
+title: The Brachistochrone
+author: Stuart Watt
+date: '2020-02-15'
+slug: brachistochrone
+categories: []
+tags:
+  - Physics
+  - Simulation
+  - Optimisation
+  - Animation
+  - R
+subtitle: ''
+summary: ''
+lastmod: '2020-02-15'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  html_document:
+    fig_caption: true
+---
+
+```{r Run_Full_Code, include=FALSE}
+N <- 250                                # step size
+R <- 1                                  # radius of circle
+deltaTheta <- 4*pi                      # total rotation
+theta = seq(0, deltaTheta, length.out = N)
+cycl.plot.data <- data.frame(x.cycl = R*(theta)-sin(theta),
+                             y.cycl = R*(1-cos(theta)),
+                             circle.center.x = seq(0, deltaTheta*R, length.out = N),
+                             t = 1:N)
+
+library(ggplot2)
+library(ggforce)
+library(gganimate)
+cycl.anim <- ggplot(cycl.plot.data) +
+  geom_circle(aes(x0 = circle.center.x, y0 = R, r = R)) +
+  geom_point(aes(x = x.cycl, y = y.cycl), colour = "red") +
+  geom_path(data = cycl.plot.data[,c("x.cycl","y.cycl")],
+            aes(x = x.cycl, y = y.cycl), colour = "red",
+            linetype = 2) +
+  geom_segment(aes(x = -1, xend = deltaTheta*R+1, y = 0, yend = 0), colour = "gray20") +
+  coord_equal() +
+  theme_void() +
+  transition_time(t) +
+  shadow_wake(wake_length = 0.05)
+cycl.anim <- animate(cycl.anim, renderer = gifski_renderer(),
+                     end_pause = 10, res = 100, fps = 25,
+                     width = 700, height = 200)
+
+getBrachTraj <- function(P1, P2, N){
+  theta.i <- 0 
+  theta.f <- uniroot(function(theta) (P2[1]-P1[1])/(P2[2]-P1[2]) - (theta-sin(theta))/(cos(theta)-1),
+                     interval = c(10e-6, 2*pi),  # we don't use 0 to avoid devision by zero
+                     extendInt = c("upX"),
+                     tol = 10e-10)$root
+  theta <- seq(theta.i, theta.f, length.out = N+1)
+  R <- (P2[2]-P1[2])/(cos(theta.f)-1)
+  data.frame(x = P1[1]+R*(theta-sin(theta)),
+             y = P1[2]+R*(cos(theta)-1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getLinTraj <- function(P1, P2, N){
+  data.frame(x = seq(from = P1[1], to = P2[1], length.out = N+1),
+             y = seq(from = P1[2], to = P2[2], length.out = N+1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getPolygonalTraj <- function(P1,P2, N){
+  h <- abs(P2[2]-P1[2])
+  L <- abs(P2[1]-P1[1])
+  n1 <- ceiling(h/(h+L)*(N+1))
+  n2 <- N+2-n1
+  data.frame(x = c(rep(P1[1], times = n1),
+                   seq(P1[1], P2[1], length.out = n2)[2:n2]),
+             y = c(seq(P1[2], P2[2], length.out = n1),
+                   rep(P2[2], times = n2)[2:n2]),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+motion <- function(traj){
+  if(any(traj$y[2:nrow(traj)] >= traj$y[1])) stop("Improper path")
+  N <- nrow(traj)-1
+  a <- rep(NA, N+1)
+  g <- 9.81
+  traj$t[1] <- 0
+  traj$v[1] <- 0
+  segLengths <- sqrt(diff(traj$x)^2 + diff(traj$y)^2)
+  traj$a[1:(nrow(traj)-1)] <- g*(-1)*diff(traj$y) / segLengths
+  
+  getSegTime <- function(d,v0,a){
+    if(a == 0){
+      return(d/v0)
+    }else{
+      return((sqrt(v0^2+2*a*d)-v0)/a)
+    }
+  }
+  
+  for(ii in 2:nrow(traj)){
+    dt <- getSegTime(d = segLengths[ii-1], v0 = traj$v[ii-1],
+                     a = traj$a[ii-1])
+    traj$t[ii] <- traj$t[ii-1] + dt
+    traj$v[ii] <- traj$v[ii-1] + traj$a[ii-1]*dt
+  }
+  return(traj)
+}
+
+library(tidyverse)
+library(gganimate)
+library(gifski)
+
+N <- 50
+P1 <- c(0,0.3)
+P2 <- c(1,0)
+
+lin.motion <- motion(getLinTraj(P1,P2,N))
+brach.motion <- motion(getBrachTraj(P1,P2,N))
+polygon.motion <- motion(getPolygonalTraj(P1,P2,N))
+
+getStates <- function(t,traj){
+  N <- nrow(traj)-1
+  n.new <- length(t)
+  idx <- findInterval(t, traj$t)
+  newVal <- data.frame(x = rep(NA, times = n.new),
+                       y = rep(NA, times = n.new),
+                       v = rep(NA, times = n.new),
+                       a = rep(NA, times = n.new),
+                       t = t)
+  for(ii in 1:n.new){
+    if(idx[ii] == N+1){
+      newVal$x[ii] <- traj$x[N+1]
+      newVal$y[ii] <- traj$y[N+1]
+      newVal$v[ii] <- 0
+      newVal$a[ii] <- 0
+    }else{
+      t0 <- traj$t[idx[ii]]
+      dt <- t[ii]-t0
+      ds <- traj$v[idx[ii]]*dt + 0.5*traj$a[idx[ii]]*dt^2   # s = u*t + 1/2*a*t^2
+      orig.segLength <- sqrt(diff(traj$x[idx[ii]:(idx[ii]+1)])^2+diff(traj$y[idx[ii]:(idx[ii]+1)])^2)
+      newVal$x[ii] <- traj$x[idx[ii]] + ds*(traj$x[idx[ii]+1]-traj$x[idx[ii]])/orig.segLength
+      newVal$y[ii] <- traj$y[idx[ii]] + ds*(traj$y[idx[ii]+1]-traj$y[idx[ii]])/orig.segLength
+      newVal$v[ii] <- traj$v[idx[ii]] + traj$a[idx[ii]]*dt
+      newVal$a[ii] <- traj$a[idx[ii]]
+    }
+  }
+  out.df <- rbind(traj, newVal)
+  return(out.df[order(out.df$t),])
+}
+
+times <- c(lin.motion$t, brach.motion$t, polygon.motion$t)
+
+lin.motion <- getStates(t = times, lin.motion)
+brach.motion <- getStates(t = times, brach.motion)
+polygon.motion <- getStates(t = times, polygon.motion)
+
+lin.motion$name <- "Linear"
+brach.motion$name <- "Brachistochrone"
+polygon.motion$name <- "Polygon"
+
+motion.data <- rbind(lin.motion, brach.motion, polygon.motion)
+
+anim <- ggplot() +
+  geom_path(data = select(motion.data, x, y, name), aes(x, y, colour = name)) +
+  geom_point(data = motion.data, aes(x,y, fill = name), shape = 21, colour = "black",
+             size = 4) +
+  guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
+  coord_fixed() +
+  transition_time(t) +
+  shadow_wake(wake_length = 0.1)
+anim <- animate(anim, renderer = gifski_renderer(),
+                duration = 3, end_pause = 25, fps = 30, res = 100,
+                width = 650, height = 250)
+# save_animation(anim, file = "animation/anim.gif")
+
+N.range <- 2:100
+times <- sapply(N.range, function(N,P1,P2) motion(getBrachTraj(P1,P2,N))$t[N+1], P1 = P1, P2 = P2)
+conv.plot <- ggplot(data.frame(N = N.range, t = times)) +
+               geom_line(aes(N,t)) +
+               theme(axis.text=element_text(size=12), axis.title=element_text(size=14))
+
+P1 <- c(0,0.3)
+P2 <- c(1,0)
+N <- 30       # Number of line segments
+
+brach.path <- motion(getBrachTraj(P1,P2,N))
+brach.path$t <- NULL
+brach.path$name <- NULL
+brach.path$v <- NULL
+brach.path$a <- NULL
+
+max.iter <- 100000L # maximum number of iterations for convergence method
+intermed.y.count <- 0L
+intermed.y <- matrix(as.numeric(NA), ncol = N+1, nrow = max.iter)
+
+getTime <- function(intermed.heights, inx, P1, P2){
+  intermed.y.count <<- intermed.y.count + 1L
+  intermed.y[intermed.y.count,] <<- c(P1[2],intermed.heights,P2[2])
+  N <- length(intermed.heights)+1
+  traj <- data.frame(x = inx,
+                     y = intermed.y[intermed.y.count,],
+                     v = rep(NA, times = N+1),
+                     a = rep(NA, times = N+1),
+                     t = rep(NA, times = N+1))
+  return(motion(traj)$t[nrow(traj)])
+}
+
+set.seed(1) # for reproducability
+minima <- optim(par = seq(P1[2],P2[2], length.out = N+1)[2:N],
+                fn = getTime,
+                lower = rep(-5, times = N-1),
+                upper = rep(P1[2]-1e-5, times = N-1),
+                method = "L-BFGS-B",
+                inx = brach.path$x,
+                P1 = P1,
+                P2 = P2)
+
+y <- as.vector(intermed.y[1:intermed.y.count,])
+x <- rep(brach.path$x,
+         times = rep(intermed.y.count, N+1))
+iter <- rep(1:intermed.y.count, 
+            times = N+1)
+plot.data <- data.frame(x = x, y = y, iter = iter)
+
+anim.optim <- ggplot() +
+  geom_path(data = brach.path, aes(x = x, y = y), colour = "red") +
+  geom_point(data = brach.path, aes(x = x, y = y), colour = "red") +
+  geom_path(data = plot.data, aes(x = x, y = y)) +
+  geom_point(data = plot.data, aes(x = x, y = y)) +
+  coord_fixed() +
+  ylim(min(c(brach.path$y,plot.data$y)), max(c(brach.path$y,plot.data$y))) +
+  transition_time(iter)
+anim.optim <- animate(anim.optim, renderer = gifski_renderer(),
+                      duration = 10, end_pause = 5, fps = 20, res = 100,
+                      width = 800, height = 400)
+# save_animation(anim.optim, file = "animation/anim_convergance.gif")
+```
+
+
+Consider a point $P_1$ alongside another point $P_2$ which lies below, but not directly below it. Which path allows a bead initially at rest, to slide frictionlessly from $P_1$ to $P_2$ with the least possible time $t$ when subject to a constant downward gravitational force? This is known as the [Brachistochrone problem](http://mathworld.wolfram.com/BrachistochroneProblem.html) and it is famous in the development of calculus.
+
+```{r Animation, fig.align='center', echo=FALSE, fig.cap="Simulated motion for different paths (time not to scale)", warning=FALSE, message=FALSE}
+anim
+```
+
+The solution to this problem is the Brachistochrone curve, which was found to be a cycloid. A cycloid is a path which is described by a point on a circle rolling along a flat surface.
+
+```{r CycloidPlot, fig.align='center', echo=FALSE, fig.cap="Cycloid traced by its generating circle. The Brachistochrone curve has the cusps pointed upward."}
+cycl.anim
+```
+
+I was interested in investigating this numerically, so I started to write a script simulating a bead falling down a path made of $N$ line segments. Details are found below, but in summary the simulation was successful with the predicted time quickly converging with increasing number of line segments $N$.
+
+```{r Convergenceplot, out.width="65%", fig.align='center', echo=FALSE, fig.cap="Simulated time (in seconds) taken for bead to travel across Brachistochrone path approximated with $N$ line segments between $P_1=(0,0.3)$ and $P_2=(1,0)$ in meters."}
+conv.plot
+```
+
+Since the Brachistochrone problem is about finding a global minima an approximate solution should in principle be found via an optimisation algorithm. I used an [optimisation algorithm](https://en.wikipedia.org/wiki/Limited-memory_BFGS#L-BFGS-B) to minimise the simulated travel time by varying the $y$-coordinates of an intermediate set of points initially making up a straight line segment from $P_1$ to $P_2$. The $x$-coordinates of these points remained fixed at equal values to the parametrisation of the known Brachistochrone curve. By recording the $y$-values for every function call the following animation was made.
+
+```{r ConvergenceAnimation, echo=FALSE, fig.align='center', fig.cap="Progressive paths considered by optimisation method when finding fastest path of descent (shown in black) against known solution (shown in red)."}
+anim.optim
+```
+
+Looks good! So we can indeed find an approximate solution numerically without prior knowledge.
+
+## Code
+
+For the Brachistochrone trajectory, we use the set of parametric equations for a cycloid:
+$$x(\theta) = x_0+R(\theta-\sin\theta),\quad y(\theta)=y_0+R(\cos\theta-1).$$
+Note that the $y(\theta)$ is in a slightly different form than usual. I prefer having my $y$ axis pointing vertically upwards (and hence, against gravity), so I use these equations are for an "upside down" cycloid.
+
+We need to find the interval to vary $\theta$ over, along with $x_0$, $y_0$ and $R$. Setting an initial $\theta_0 = 0$ gives $x=x_0$ and $y=y_0$: these are components of $P_1$. Dividing one parametric equation by the other before rearranging, we obtain
+$$\frac{x(\theta)-x_0}{y(\theta)-y_0}-\frac{\theta-\sin\theta}{\cos\theta-1}=0.$$
+We can solve this numerically at $P_2$ to find the upper range of the parameter value $\theta_1$. Finally, $R$ can be found by simple substitution.
+
+I create a function to obtain Brachistochrone paths approximated over $N$ segments with boundary conditions at the coordinates $P_1$ and $P_2$. This is returned in a data frame with a time column containing missing values. I also create two similar functions for straight and polygonal paths.
+
+```{r Traj_Functions,echo=TRUE,eval=FALSE,results='hide'}
+getBrachTraj <- function(P1, P2, N){
+  theta.i <- 0 
+  theta.f <- uniroot(function(theta) (P2[1]-P1[1])/(P2[2]-P1[2]) - (theta-sin(theta))/(cos(theta)-1),
+                     interval = c(10e-6, 2*pi),  # we don't use 0 to avoid devision by zero
+                     extendInt = c("upX"),
+                     tol = 10e-10)$root
+  theta <- seq(theta.i, theta.f, length.out = N+1)
+  R <- (P2[2]-P1[2])/(cos(theta.f)-1)
+  data.frame(x = P1[1]+R*(theta-sin(theta)),
+             y = P1[2]+R*(cos(theta)-1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getLinTraj <- function(P1, P2, N){
+  data.frame(x = seq(from = P1[1], to = P2[1], length.out = N+1),
+             y = seq(from = P1[2], to = P2[2], length.out = N+1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getPolygonalTraj <- function(P1,P2, N){
+  h <- abs(P2[2]-P1[2])
+  L <- abs(P2[1]-P1[1])
+  n1 <- ceiling(h/(h+L)*(N+1))
+  n2 <- N+2-n1
+  data.frame(x = c(rep(P1[1], times = n1),
+                   seq(P1[1], P2[1], length.out = n2)[2:n2]),
+             y = c(seq(P1[2], P2[2], length.out = n1),
+                   rep(P2[2], times = n2)[2:n2]),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+```
+
+We can now create a function that takes our trajectory data frame from above and fills the velocity, acceleration and time attributes. Here we just have $N$ cases of simple inclined plane problems. By finding the segment distances and the accelerations dependent on the slope of the segments, we can calculate speeds of the bead entering and exiting each segment, thus allowing us to calculate the progress of time and store it in our data frame.
+
+```{r Motion_Function, echo=TRUE,eval=FALSE,results='hide'}
+motion <- function(traj){
+  if(any(traj$y[2:nrow(traj)] >= traj$y[1])) stop("Improper path")
+  N <- nrow(traj)-1
+  a <- rep(NA, N+1)
+  g <- 9.81
+  traj$t[1] <- 0
+  traj$v[1] <- 0
+  segLengths <- sqrt(diff(traj$x)^2 + diff(traj$y)^2)
+  traj$a[1:(nrow(traj)-1)] <- g*(-1)*diff(traj$y) / segLengths
+  
+  getSegTime <- function(d,v0,a){
+    if(a == 0){
+      return(d/v0)
+    }else{
+      return((sqrt(v0^2+2*a*d)-v0)/a)
+    }
+  }
+  
+  for(ii in 2:nrow(traj)){
+    dt <- getSegTime(d = segLengths[ii-1], v0 = traj$v[ii-1],
+                     a = traj$a[ii-1])
+    traj$t[ii] <- traj$t[ii-1] + dt
+    traj$v[ii] <- traj$v[ii-1] + traj$a[ii-1]*dt
+  }
+  return(traj)
+}
+```
+
+Simulation for our three paths is now possible.
+
+```{r, echo=TRUE,results='hide',eval=FALSE}
+N <- 50
+P1 <- c(0,0.3)
+P2 <- c(1,0)
+
+lin.motion <- motion(getLinTraj(P1,P2,N))
+brach.motion <- motion(getBrachTraj(P1,P2,N))
+polygon.motion <- motion(getPolygonalTraj(P1,P2,N))
+```
+
+For our animation we have a slight problem: each of these data frames will almost certainly each have a set of unique $t$ values (ignoring $t=0$). This means that for a given moment in time we do not know their positions. We can solve this problem by writing a function that takes a motion data frame along with a vector of $t$ values and outputs an updated data frame containing rows with $t$. Since our simulation involves a collection of small inclined planes, we can calculate the required information for any time $t'$ using any data with the closest $t$ before and after.
+
+```{r, echo=TRUE, results='hide',eval=FALSE}
+getStates <- function(t,traj){
+  N <- nrow(traj)-1
+  n.new <- length(t)
+  idx <- findInterval(t, traj$t)
+  newVal <- data.frame(x = rep(NA, times = n.new),
+                       y = rep(NA, times = n.new),
+                       v = rep(NA, times = n.new),
+                       a = rep(NA, times = n.new),
+                       t = t)
+  for(ii in 1:n.new){
+    if(idx[ii] == N+1){
+      newVal$x[ii] <- traj$x[N+1]
+      newVal$y[ii] <- traj$y[N+1]
+      newVal$v[ii] <- 0
+      newVal$a[ii] <- 0
+    }else{
+      t0 <- traj$t[idx[ii]]
+      dt <- t[ii]-t0
+      ds <- traj$v[idx[ii]]*dt + 0.5*traj$a[idx[ii]]*dt^2   # s = u*t + 1/2*a*t^2
+      orig.segLength <- sqrt(diff(traj$x[idx[ii]:(idx[ii]+1)])^2+diff(traj$y[idx[ii]:(idx[ii]+1)])^2)
+      newVal$x[ii] <- traj$x[idx[ii]] + ds*(traj$x[idx[ii]+1]-traj$x[idx[ii]])/orig.segLength
+      newVal$y[ii] <- traj$y[idx[ii]] + ds*(traj$y[idx[ii]+1]-traj$y[idx[ii]])/orig.segLength
+      newVal$v[ii] <- traj$v[idx[ii]] + traj$a[idx[ii]]*dt
+      newVal$a[ii] <- traj$a[idx[ii]]
+    }
+  }
+  out.df <- rbind(traj, newVal)
+  return(out.df[order(out.df$t),])
+}
+
+times <- c(lin.motion$t, brach.motion$t, polygon.motion$t)
+
+lin.motion <- getStates(t = times, lin.motion)
+brach.motion <- getStates(t = times, brach.motion)
+polygon.motion <- getStates(t = times, polygon.motion)
+```
+
+Now we can assemble the data and produce our animation:
+
+```{r, echo=TRUE, results='hide',eval=FALSE}
+library(tidyverse)
+library(gganimate)
+library(gifski)
+
+lin.motion$name <- "Linear"
+brach.motion$name <- "Brachistochrone"
+polygon.motion$name <- "Polygon"
+
+motion.data <- rbind(lin.motion, brach.motion, polygon.motion)
+
+anim <- ggplot() +
+  geom_path(data = select(motion.data, x, y, name), aes(x, y, colour = name)) +
+  geom_point(data = motion.data, aes(x,y, fill = name), shape = 21, colour = "black",
+             size = 4) +
+  guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
+  coord_fixed() +
+  transition_time(t) +
+  shadow_wake(wake_length = 0.1)
+anim <- animate(anim, renderer = gifski_renderer(),
+                duration = 3, end_pause = 25, fps = 30, res = 100,
+                width = 650, height = 250)
+```
+
+Now, to perform the optimisation, we first need to set up our Brachistochrone path.
+
+```{r, echo=TRUE, results='hide',eval=FALSE}
+P1 <- c(0,0.3)
+P2 <- c(1,0)
+N <- 30       # Number of line segments
+
+brach.path <- motion(getBrachTraj(P1,P2,N))
+brach.path$t <- NULL
+brach.path$name <- NULL
+brach.path$v <- NULL
+brach.path$a <- NULL
+```
+
+We create a matrix to store the intermediate $y$-values as rows, along with a wrapper function that takes these along with the $x$-values and end points of our path before returning the total time taken. Every time this function is called, the inserted $y$-values are stored into our matrix.
+
+```{r, echo=TRUE, results='hide',eval=FALSE}
+max.iter <- 100000L # maximum number of iterations for convergence method
+intermed.y.count <- 0L
+intermed.y <- matrix(as.numeric(NA), ncol = N+1, nrow = max.iter)
+
+getTime <- function(intermed.heights, inx, P1, P2){
+  intermed.y.count <<- intermed.y.count + 1L
+  intermed.y[intermed.y.count,] <<- c(P1[2],intermed.heights,P2[2])
+  N <- length(intermed.heights)+1
+  traj <- data.frame(x = inx,
+                     y = intermed.y[intermed.y.count,],
+                     v = rep(NA, times = N+1),
+                     a = rep(NA, times = N+1),
+                     t = rep(NA, times = N+1))
+  return(motion(traj)$t[nrow(traj)])
+}
+
+```
+
+Now we may apply the optimisation function.
+
+```{r, echo=TRUE, results='hide',eval=FALSE}
+set.seed(1) # for reproducability
+minima <- optim(par = seq(P1[2],P2[2], length.out = N+1)[2:N],
+                fn = getTime,
+                lower = rep(-5, times = N-1),
+                upper = rep(P1[2]-1e-5, times = N-1),
+                method = "L-BFGS-B",
+                inx = brach.path$x,
+                P1 = P1,
+                P2 = P2)
+```
+
+Finally, we can create the animation:
+
+```{r, echo=TRUE, results='hide',eval=FALSE}
+y <- as.vector(intermed.y[1:intermed.y.count,])
+x <- rep(brach.path$x,
+         times = rep(intermed.y.count, N+1))
+iter <- rep(1:intermed.y.count, 
+            times = N+1)
+plot.data <- data.frame(x = x, y = y, iter = iter)
+
+anim.optim <- ggplot() +
+  geom_path(data = brach.path, aes(x = x, y = y), colour = "red") +
+  geom_point(data = brach.path, aes(x = x, y = y), colour = "red") +
+  geom_path(data = plot.data, aes(x = x, y = y)) +
+  geom_point(data = plot.data, aes(x = x, y = y)) +
+  coord_fixed() +
+  ylim(min(c(brach.path$y,plot.data$y)), max(c(brach.path$y,plot.data$y))) +
+  transition_time(iter)
+anim.optim <- animate(anim.optim, renderer = gifski_renderer(),
+                      duration = 10, end_pause = 5, fps = 20, res = 100,
+                      width = 800, height = 400)
+```

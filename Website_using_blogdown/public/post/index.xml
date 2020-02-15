@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts | Stuart John Watt</title>
+    <link>/post/</link>
+      <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <description>Posts</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Sat, 15 Feb 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>img/map[gravatar:%!s(bool=false) shape:circle]</url>
+      <title>Posts</title>
+      <link>/post/</link>
+    </image>
+    
+    <item>
+      <title>The Brachistochrone</title>
+      <link>/post/brachistochrone/</link>
+      <pubDate>Sat, 15 Feb 2020 00:00:00 +0000</pubDate>
+      <guid>/post/brachistochrone/</guid>
+      <description>
+
+
+&lt;p&gt;Consider a point &lt;span class=&#34;math inline&#34;&gt;\(P_1\)&lt;/span&gt; alongside another point &lt;span class=&#34;math inline&#34;&gt;\(P_2\)&lt;/span&gt; which lies below, but not directly below it. Which path allows a bead initially at rest, to slide frictionlessly from &lt;span class=&#34;math inline&#34;&gt;\(P_1\)&lt;/span&gt; to &lt;span class=&#34;math inline&#34;&gt;\(P_2\)&lt;/span&gt; with the least possible time &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; when subject to a constant downward gravitational force? This is known as the &lt;a href=&#34;http://mathworld.wolfram.com/BrachistochroneProblem.html&#34;&gt;Brachistochrone problem&lt;/a&gt; and it is famous in the development of calculus.&lt;/p&gt;
+&lt;div class=&#34;figure&#34; style=&#34;text-align: center&#34;&gt;&lt;span id=&#34;fig:Animation&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/2020-02-09-the-brachistochrone_files/figure-html/Animation-1.gif&#34; alt=&#34;Simulated motion for different paths (time not to scale)&#34;  /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 1: Simulated motion for different paths (time not to scale)
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;The solution to this problem is the Brachistochrone curve, which was found to be a cycloid. A cycloid is a path which is described by a point on a circle rolling along a flat surface.&lt;/p&gt;
+&lt;div class=&#34;figure&#34; style=&#34;text-align: center&#34;&gt;&lt;span id=&#34;fig:CycloidPlot&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/2020-02-09-the-brachistochrone_files/figure-html/CycloidPlot-1.gif&#34; alt=&#34;Cycloid traced by its generating circle. The Brachistochrone curve has the cusps pointed upward.&#34;  /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 2: Cycloid traced by its generating circle. The Brachistochrone curve has the cusps pointed upward.
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;I was interested in investigating this numerically, so I started to write a script simulating a bead falling down a path made of &lt;span class=&#34;math inline&#34;&gt;\(N\)&lt;/span&gt; line segments. Details are found below, but in summary the simulation was successful with the predicted time quickly converging with increasing number of line segments &lt;span class=&#34;math inline&#34;&gt;\(N\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class=&#34;figure&#34; style=&#34;text-align: center&#34;&gt;&lt;span id=&#34;fig:Convergenceplot&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/2020-02-09-the-brachistochrone_files/figure-html/Convergenceplot-1.png&#34; alt=&#34;Simulated time (in seconds) taken for bead to travel across Brachistochrone path approximated with $N$ line segments between $P_1=(0,0.3)$ and $P_2=(1,0)$ in meters.&#34; width=&#34;65%&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 3: Simulated time (in seconds) taken for bead to travel across Brachistochrone path approximated with &lt;span class=&#34;math inline&#34;&gt;\(N\)&lt;/span&gt; line segments between &lt;span class=&#34;math inline&#34;&gt;\(P_1=(0,0.3)\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(P_2=(1,0)\)&lt;/span&gt; in meters.
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Since the Brachistochrone problem is about finding a global minima an approximate solution should in principle be found via an optimisation algorithm. I used an &lt;a href=&#34;https://en.wikipedia.org/wiki/Limited-memory_BFGS#L-BFGS-B&#34;&gt;optimisation algorithm&lt;/a&gt; to minimise the simulated travel time by varying the &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt;-coordinates of an intermediate set of points initially making up a straight line segment from &lt;span class=&#34;math inline&#34;&gt;\(P_1\)&lt;/span&gt; to &lt;span class=&#34;math inline&#34;&gt;\(P_2\)&lt;/span&gt;. The &lt;span class=&#34;math inline&#34;&gt;\(x\)&lt;/span&gt;-coordinates of these points remained fixed at equal values to the parametrisation of the known Brachistochrone curve. By recording the &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt;-values for every function call the following animation was made.&lt;/p&gt;
+&lt;div class=&#34;figure&#34; style=&#34;text-align: center&#34;&gt;&lt;span id=&#34;fig:ConvergenceAnimation&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/2020-02-09-the-brachistochrone_files/figure-html/ConvergenceAnimation-1.gif&#34; alt=&#34;Progressive paths considered by optimisation method when finding fastest path of descent (shown in black) against known solution (shown in red).&#34;  /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 4: Progressive paths considered by optimisation method when finding fastest path of descent (shown in black) against known solution (shown in red).
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Looks good! So we can indeed find an approximate solution numerically without prior knowledge.&lt;/p&gt;
+&lt;div id=&#34;code&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Code&lt;/h2&gt;
+&lt;p&gt;For the Brachistochrone trajectory, we use the set of parametric equations for a cycloid:
+&lt;span class=&#34;math display&#34;&gt;\[x(\theta) = x_0+R(\theta-\sin\theta),\quad y(\theta)=y_0+R(\cos\theta-1).\]&lt;/span&gt;
+Note that the &lt;span class=&#34;math inline&#34;&gt;\(y(\theta)\)&lt;/span&gt; is in a slightly different form than usual. I prefer having my &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt; axis pointing vertically upwards (and hence, against gravity), so I use these equations are for an “upside down” cycloid.&lt;/p&gt;
+&lt;p&gt;We need to find the interval to vary &lt;span class=&#34;math inline&#34;&gt;\(\theta\)&lt;/span&gt; over, along with &lt;span class=&#34;math inline&#34;&gt;\(x_0\)&lt;/span&gt;, &lt;span class=&#34;math inline&#34;&gt;\(y_0\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt;. Setting an initial &lt;span class=&#34;math inline&#34;&gt;\(\theta_0 = 0\)&lt;/span&gt; gives &lt;span class=&#34;math inline&#34;&gt;\(x=x_0\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(y=y_0\)&lt;/span&gt;: these are components of &lt;span class=&#34;math inline&#34;&gt;\(P_1\)&lt;/span&gt;. Dividing one parametric equation by the other before rearranging, we obtain
+&lt;span class=&#34;math display&#34;&gt;\[\frac{x(\theta)-x_0}{y(\theta)-y_0}-\frac{\theta-\sin\theta}{\cos\theta-1}=0.\]&lt;/span&gt;
+We can solve this numerically at &lt;span class=&#34;math inline&#34;&gt;\(P_2\)&lt;/span&gt; to find the upper range of the parameter value &lt;span class=&#34;math inline&#34;&gt;\(\theta_1\)&lt;/span&gt;. Finally, &lt;span class=&#34;math inline&#34;&gt;\(R\)&lt;/span&gt; can be found by simple substitution.&lt;/p&gt;
+&lt;p&gt;I create a function to obtain Brachistochrone paths approximated over &lt;span class=&#34;math inline&#34;&gt;\(N\)&lt;/span&gt; segments with boundary conditions at the coordinates &lt;span class=&#34;math inline&#34;&gt;\(P_1\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(P_2\)&lt;/span&gt;. This is returned in a data frame with a time column containing missing values. I also create two similar functions for straight and polygonal paths.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;getBrachTraj &amp;lt;- function(P1, P2, N){
+  theta.i &amp;lt;- 0 
+  theta.f &amp;lt;- uniroot(function(theta) (P2[1]-P1[1])/(P2[2]-P1[2]) - (theta-sin(theta))/(cos(theta)-1),
+                     interval = c(10e-6, 2*pi),  # we don&amp;#39;t use 0 to avoid devision by zero
+                     extendInt = c(&amp;quot;upX&amp;quot;),
+                     tol = 10e-10)$root
+  theta &amp;lt;- seq(theta.i, theta.f, length.out = N+1)
+  R &amp;lt;- (P2[2]-P1[2])/(cos(theta.f)-1)
+  data.frame(x = P1[1]+R*(theta-sin(theta)),
+             y = P1[2]+R*(cos(theta)-1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getLinTraj &amp;lt;- function(P1, P2, N){
+  data.frame(x = seq(from = P1[1], to = P2[1], length.out = N+1),
+             y = seq(from = P1[2], to = P2[2], length.out = N+1),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}
+
+getPolygonalTraj &amp;lt;- function(P1,P2, N){
+  h &amp;lt;- abs(P2[2]-P1[2])
+  L &amp;lt;- abs(P2[1]-P1[1])
+  n1 &amp;lt;- ceiling(h/(h+L)*(N+1))
+  n2 &amp;lt;- N+2-n1
+  data.frame(x = c(rep(P1[1], times = n1),
+                   seq(P1[1], P2[1], length.out = n2)[2:n2]),
+             y = c(seq(P1[2], P2[2], length.out = n1),
+                   rep(P2[2], times = n2)[2:n2]),
+             v = rep(NA, times = N+1),
+             a = rep(NA, times = N+1),
+             t = rep(NA, times = N+1))
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We can now create a function that takes our trajectory data frame from above and fills the velocity, acceleration and time attributes. Here we just have &lt;span class=&#34;math inline&#34;&gt;\(N\)&lt;/span&gt; cases of simple inclined plane problems. By finding the segment distances and the accelerations dependent on the slope of the segments, we can calculate speeds of the bead entering and exiting each segment, thus allowing us to calculate the progress of time and store it in our data frame.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;motion &amp;lt;- function(traj){
+  if(any(traj$y[2:nrow(traj)] &amp;gt;= traj$y[1])) stop(&amp;quot;Improper path&amp;quot;)
+  N &amp;lt;- nrow(traj)-1
+  a &amp;lt;- rep(NA, N+1)
+  g &amp;lt;- 9.81
+  traj$t[1] &amp;lt;- 0
+  traj$v[1] &amp;lt;- 0
+  segLengths &amp;lt;- sqrt(diff(traj$x)^2 + diff(traj$y)^2)
+  traj$a[1:(nrow(traj)-1)] &amp;lt;- g*(-1)*diff(traj$y) / segLengths
+  
+  getSegTime &amp;lt;- function(d,v0,a){
+    if(a == 0){
+      return(d/v0)
+    }else{
+      return((sqrt(v0^2+2*a*d)-v0)/a)
+    }
+  }
+  
+  for(ii in 2:nrow(traj)){
+    dt &amp;lt;- getSegTime(d = segLengths[ii-1], v0 = traj$v[ii-1],
+                     a = traj$a[ii-1])
+    traj$t[ii] &amp;lt;- traj$t[ii-1] + dt
+    traj$v[ii] &amp;lt;- traj$v[ii-1] + traj$a[ii-1]*dt
+  }
+  return(traj)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Simulation for our three paths is now possible.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;N &amp;lt;- 50
+P1 &amp;lt;- c(0,0.3)
+P2 &amp;lt;- c(1,0)
+
+lin.motion &amp;lt;- motion(getLinTraj(P1,P2,N))
+brach.motion &amp;lt;- motion(getBrachTraj(P1,P2,N))
+polygon.motion &amp;lt;- motion(getPolygonalTraj(P1,P2,N))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;For our animation we have a slight problem: each of these data frames will almost certainly each have a set of unique &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; values (ignoring &lt;span class=&#34;math inline&#34;&gt;\(t=0\)&lt;/span&gt;). This means that for a given moment in time we do not know their positions. We can solve this problem by writing a function that takes a motion data frame along with a vector of &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; values and outputs an updated data frame containing rows with &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt;. Since our simulation involves a collection of small inclined planes, we can calculate the required information for any time &lt;span class=&#34;math inline&#34;&gt;\(t&amp;#39;\)&lt;/span&gt; using any data with the closest &lt;span class=&#34;math inline&#34;&gt;\(t\)&lt;/span&gt; before and after.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;getStates &amp;lt;- function(t,traj){
+  N &amp;lt;- nrow(traj)-1
+  n.new &amp;lt;- length(t)
+  idx &amp;lt;- findInterval(t, traj$t)
+  newVal &amp;lt;- data.frame(x = rep(NA, times = n.new),
+                       y = rep(NA, times = n.new),
+                       v = rep(NA, times = n.new),
+                       a = rep(NA, times = n.new),
+                       t = t)
+  for(ii in 1:n.new){
+    if(idx[ii] == N+1){
+      newVal$x[ii] &amp;lt;- traj$x[N+1]
+      newVal$y[ii] &amp;lt;- traj$y[N+1]
+      newVal$v[ii] &amp;lt;- 0
+      newVal$a[ii] &amp;lt;- 0
+    }else{
+      t0 &amp;lt;- traj$t[idx[ii]]
+      dt &amp;lt;- t[ii]-t0
+      ds &amp;lt;- traj$v[idx[ii]]*dt + 0.5*traj$a[idx[ii]]*dt^2   # s = u*t + 1/2*a*t^2
+      orig.segLength &amp;lt;- sqrt(diff(traj$x[idx[ii]:(idx[ii]+1)])^2+diff(traj$y[idx[ii]:(idx[ii]+1)])^2)
+      newVal$x[ii] &amp;lt;- traj$x[idx[ii]] + ds*(traj$x[idx[ii]+1]-traj$x[idx[ii]])/orig.segLength
+      newVal$y[ii] &amp;lt;- traj$y[idx[ii]] + ds*(traj$y[idx[ii]+1]-traj$y[idx[ii]])/orig.segLength
+      newVal$v[ii] &amp;lt;- traj$v[idx[ii]] + traj$a[idx[ii]]*dt
+      newVal$a[ii] &amp;lt;- traj$a[idx[ii]]
+    }
+  }
+  out.df &amp;lt;- rbind(traj, newVal)
+  return(out.df[order(out.df$t),])
+}
+
+times &amp;lt;- c(lin.motion$t, brach.motion$t, polygon.motion$t)
+
+lin.motion &amp;lt;- getStates(t = times, lin.motion)
+brach.motion &amp;lt;- getStates(t = times, brach.motion)
+polygon.motion &amp;lt;- getStates(t = times, polygon.motion)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we can assemble the data and produce our animation:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+library(gganimate)
+library(gifski)
+
+lin.motion$name &amp;lt;- &amp;quot;Linear&amp;quot;
+brach.motion$name &amp;lt;- &amp;quot;Brachistochrone&amp;quot;
+polygon.motion$name &amp;lt;- &amp;quot;Polygon&amp;quot;
+
+motion.data &amp;lt;- rbind(lin.motion, brach.motion, polygon.motion)
+
+anim &amp;lt;- ggplot() +
+  geom_path(data = select(motion.data, x, y, name), aes(x, y, colour = name)) +
+  geom_point(data = motion.data, aes(x,y, fill = name), shape = 21, colour = &amp;quot;black&amp;quot;,
+             size = 4) +
+  guides(fill = guide_legend(title = NULL), colour = guide_legend(title = NULL)) +
+  coord_fixed() +
+  transition_time(t) +
+  shadow_wake(wake_length = 0.1)
+anim &amp;lt;- animate(anim, renderer = gifski_renderer(),
+                duration = 3, end_pause = 25, fps = 30, res = 100,
+                width = 650, height = 250)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now, to perform the optimisation, we first need to set up our Brachistochrone path.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;P1 &amp;lt;- c(0,0.3)
+P2 &amp;lt;- c(1,0)
+N &amp;lt;- 30       # Number of line segments
+
+brach.path &amp;lt;- motion(getBrachTraj(P1,P2,N))
+brach.path$t &amp;lt;- NULL
+brach.path$name &amp;lt;- NULL
+brach.path$v &amp;lt;- NULL
+brach.path$a &amp;lt;- NULL&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;We create a matrix to store the intermediate &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt;-values as rows, along with a wrapper function that takes these along with the &lt;span class=&#34;math inline&#34;&gt;\(x\)&lt;/span&gt;-values and end points of our path before returning the total time taken. Every time this function is called, the inserted &lt;span class=&#34;math inline&#34;&gt;\(y\)&lt;/span&gt;-values are stored into our matrix.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;max.iter &amp;lt;- 100000L # maximum number of iterations for convergence method
+intermed.y.count &amp;lt;- 0L
+intermed.y &amp;lt;- matrix(as.numeric(NA), ncol = N+1, nrow = max.iter)
+
+getTime &amp;lt;- function(intermed.heights, inx, P1, P2){
+  intermed.y.count &amp;lt;&amp;lt;- intermed.y.count + 1L
+  intermed.y[intermed.y.count,] &amp;lt;&amp;lt;- c(P1[2],intermed.heights,P2[2])
+  N &amp;lt;- length(intermed.heights)+1
+  traj &amp;lt;- data.frame(x = inx,
+                     y = intermed.y[intermed.y.count,],
+                     v = rep(NA, times = N+1),
+                     a = rep(NA, times = N+1),
+                     t = rep(NA, times = N+1))
+  return(motion(traj)$t[nrow(traj)])
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Now we may apply the optimisation function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;set.seed(1) # for reproducability
+minima &amp;lt;- optim(par = seq(P1[2],P2[2], length.out = N+1)[2:N],
+                fn = getTime,
+                lower = rep(-5, times = N-1),
+                upper = rep(P1[2]-1e-5, times = N-1),
+                method = &amp;quot;L-BFGS-B&amp;quot;,
+                inx = brach.path$x,
+                P1 = P1,
+                P2 = P2)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Finally, we can create the animation:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;y &amp;lt;- as.vector(intermed.y[1:intermed.y.count,])
+x &amp;lt;- rep(brach.path$x,
+         times = rep(intermed.y.count, N+1))
+iter &amp;lt;- rep(1:intermed.y.count, 
+            times = N+1)
+plot.data &amp;lt;- data.frame(x = x, y = y, iter = iter)
+
+anim.optim &amp;lt;- ggplot() +
+  geom_path(data = brach.path, aes(x = x, y = y), colour = &amp;quot;red&amp;quot;) +
+  geom_point(data = brach.path, aes(x = x, y = y), colour = &amp;quot;red&amp;quot;) +
+  geom_path(data = plot.data, aes(x = x, y = y)) +
+  geom_point(data = plot.data, aes(x = x, y = y)) +
+  coord_fixed() +
+  ylim(min(c(brach.path$y,plot.data$y)), max(c(brach.path$y,plot.data$y))) +
+  transition_time(iter)
+anim.optim &amp;lt;- animate(anim.optim, renderer = gifski_renderer(),
+                      duration = 10, end_pause = 5, fps = 20, res = 100,
+                      width = 800, height = 400)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
