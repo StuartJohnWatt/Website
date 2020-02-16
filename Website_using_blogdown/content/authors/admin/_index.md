@@ -42,4 +42,4 @@ user_groups:
 - Visitors
 ---
 
-I am currently a student at Robert Gordon University studying Data Science with The Data Lab MSc scholarship. My interests include scripting in a variety of languages, usually with the aim of extracting knowledge from data or modeling and simulating various phemonema.
+I am currently a student at Robert Gordon University studying Data Science with The Data Lab MSc scholarship. My interests include scripting in a variety of languages, usually with the aim of extracting knowledge from data or modelling and simulating various phenomena.
