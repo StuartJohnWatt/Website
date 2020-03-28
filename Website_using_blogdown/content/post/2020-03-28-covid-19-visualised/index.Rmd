@@ -1,0 +1,333 @@
+---
+title: "COVID-19 Visualised"
+author: "Stuart Watt"
+date: '2020-03-28'
+slug: []
+categories: []
+tags:
+  - coronavirus
+  - "covid-19"
+  - Animation
+  - R
+subtitle: ''
+summary: ''
+lastmod: '2020-03-28'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+output:
+  html_document:
+    fig_caption: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, out.width = "100%", fig.align = "centre")
+```
+
+Over the past few weeks the Coronavirus (or more precisely COVID-19) outbreak has been consistently the centre of attention. This pandemic has been met with an unprecedented response, with countries around the globe enforcing lock-down and social distancing measures in an attempt to slow and/or reduce its spread.
+
+As a data science student, I've been interested in how much attention has been placed on the data itself. A steady stream of new data is communicated by media either in raw form or by visualisations to satisfy the public interest.
+
+I started doing some analysis and I thought I'd share some visualisations I've made.
+
+A few data sources are available, although the ones provided by [John Hopkins](https://github.com/CSSEGISandData/COVID-19), [ECDC](https://www.ecdc.europa.eu/en/publications-data/download-todays-data-geographic-distribution-covid-19-cases-worldwide) and [WHO](https://www.who.int/emergencies/diseases/novel-coronavirus-2019/situation-reports/) seem to be the most popular. I initially used the former source, although I changed to using the ECDC data due to consistency issues. A good discussion of the datasets can be found in [here](https://ourworldindata.org/coronavirus-source-data).
+
+Note that this blog post is intended for interest only. Unlike many posts I've read, this isn't about prediction or to argue which strategy or behaviour is best to mitigate the outbreak. I think too many enthusiasts have been overconfident in their interpretation of the data, which can be harmful given the seriousness of the situation. It's best to listen to the professional scientists studying this, whether that be epidemiologists or from other fields. If you live in the UK, please follow the advice given by the [NHS](https://www.nhs.uk/conditions/coronavirus-covid-19/) and [UK Government](https://www.gov.uk/guidance/coronavirus-covid-19-information-for-the-public)!
+
+```{r PackageLoad}
+library(tidyverse)
+library(lubridate)
+library(RcppRoll)
+library(purrr)
+library(scales)
+library(magrittr)
+library(ISOcodes)
+library(readxl)
+library(httr)
+library(wbstats)
+library(maps)
+library(plotly)
+library(viridis)
+library(gifski)
+library(png)
+library(rgdal)
+library(leaflet)
+library(widgetframe)
+```
+
+```{r Import&Tidy}
+data_path <- "data/ecdc.xlsx"
+if(!file.exists(data_path)) file.create(data_path)
+
+get_data <- function(path){
+  download <- function(datetime){
+    url <- paste("https://www.ecdc.europa.eu/sites/default/files/documents/COVID-19-geographic-disbtribution-worldwide-", format(datetime, "%Y-%m-%d"), ".xlsx", sep = "")
+    GET(url, authenticate(":", ":", type="ntlm"), write_disk(path, overwrite = TRUE))
+    return(read_xlsx(path))
+  }
+  tryCatch(
+    download(Sys.time()),
+    error = function(e) download(Sys.time() - days(1))
+  ) %>% return()
+}
+
+covid <- get_data(data_path) %>% 
+  select(-c(day, month, year)) %>% 
+  mutate_at(vars("dateRep"), as_date) %>% 
+  mutate_at(vars("cases", "deaths"), as.integer) %>% 
+  mutate_at(vars("countriesAndTerritories", "geoId"), as_factor) %>% 
+  rename(date = dateRep, new_cases = cases, new_deaths = deaths, region = `countriesAndTerritories`) %>% 
+  complete(date, nesting(region, geoId)) %>% 
+  group_by(region) %>% 
+  arrange(date) %>% 
+  mutate(tot_cases = as.integer(cumsum(replace_na(new_cases, 0))),
+         tot_deaths = as.integer(cumsum(replace_na(new_deaths, 0))),
+         past_3day_cases = as.integer(roll_sumr(new_cases, n = 3L, na.rm = TRUE))) %>% 
+  ungroup() %>% 
+  select(date, region, geoId, everything()) %>% 
+  arrange(region, desc(date)) %>% 
+  mutate_at(vars("geoId"), ~recode(., 
+                                   "UK" = "GB", 
+                                   "EL" = "GR",
+                                   "PYF" = "PF"))
+```
+
+Note that I plan to update this page frequently to include recent data. This page currently has data up to `r as.character(max(covid$date))`.
+
+```{r CheckMaxDateDiff}
+if(covid %>% 
+  select(date, region) %>% 
+  group_by(region) %>% 
+  arrange(desc(date)) %>% 
+  mutate(date_diff = lag(date) - date) %>% 
+  ungroup() %>% 
+  select(date_diff) %>% 
+  filter(!is.na(date_diff)) %>% 
+  distinct() %$% 
+  max(date_diff) %>% 
+  as.integer() > 1) stop("date difference error")
+```
+
+```{r GetCountryData}
+pop_data <- wb(indicator = "SP.POP.TOTL", startdate = 2010, enddate = 2020, country = unique(covid$geoId)) %>% 
+  as_tibble() %>% 
+  select(-c(indicatorID, indicator)) %>% 
+  rename(population = value) %>% 
+  mutate_at(vars(date, population), as.integer) %>% 
+  group_by(iso3c, iso2c, country) %>% 
+  top_n(1, wt = date) %>% 
+  select(-date)
+
+position_data <- wbcountries() %>% 
+  as_tibble() %>% 
+  select(iso3c, iso2c, country, long, lat) %>% 
+  mutate_at(vars(long, lat), as.double)
+
+country_data <- left_join(pop_data, position_data, c("iso3c", "iso2c", "country"))
+
+# Complete missing data. Good website: https://gps-coordinates.org
+country_data[country_data$country == "Gibraltar", c("long", "lat")] <- c(36.1408, 5.3536)
+country_data[country_data$country == "West Bank and Gaza", c("long", "lat")] <- c(35.3027, 31.9466)
+country_data[country_data$country == "Curacao", c("long", "lat")] <- c(-68.981745, 12.178308)
+country_data[country_data$country == "Sint Maarten (Dutch part)", c("long", "lat")] <- c(-63.049271, 18.025281)
+
+# Check data
+if ((country_data %>% group_by(country, iso3c, iso2c) %>% tally %>% filter(n > 1) %>% nrow()) != 0) stop("Non-unique country data")
+if ((country_data %>% filter(is.na(long)|is.na(lat)) %>% nrow()) != 0) stop("Missing coordinate data")
+
+# remove redundant tables
+rm(pop_data, position_data)
+```
+
+```{r CompleteCovidTable}
+covid <- covid %>% 
+  left_join(country_data, by = c("geoId" = "iso2c"))
+
+missing_data <- tribble(
+  ~region, ~population, ~lat, ~long,
+  "French_Polynesia", 283007, -17.6797, -149.4068,
+  "Guernsey", 66697, 49.4656,	-2.5852,
+  "Holy_See", 1000, 41.9029,	12.4533,
+  "Jersey", 97857, 49.2144,	-2.13125,
+  "Montserrat", 5900, 16.7424,	-62.1873,
+  "Netherlands_Antilles", 227049, 12.226079, -69.060087,
+  "Taiwan", 23.6e6, 23.6978, 120.9605,
+  "Anguilla", 15094, 18.2205544, -63.068615
+)
+
+covid <- covid %>% left_join(missing_data, by = c("region")) %>% 
+  mutate(population = coalesce(population.x, as.integer(population.y)),
+         lat = coalesce(lat.x, lat.y),
+         long = coalesce(long.x, long.y)) %>% 
+  select(-c(long.x, long.y, lat.x, lat.y, population.x, population.y)) %>% 
+  mutate_at(vars(region, geoId, iso3c), as.factor) %>% 
+  mutate(tot_cases_per_million = tot_cases / population * 1e6,
+         tot_deaths_per_million = tot_deaths / population * 1e6)
+# --- To check if non-mathcing country names are associated ---
+# covid %>% 
+#   select(region, country) %>% 
+#   filter(region != country) %>% 
+#   distinct()
+
+# --- To update missing_data table ---
+#anti_join(covid, country_data, by = c("geoId" = "iso2c")) %>% select(region, geoId) %>% distinct()
+
+# --- Find regions with missing coords and population ---
+# covid %>% 
+#   filter(is.na(long)|is.na(lat)|is.na(population)) %>% 
+#   select(region) %>% 
+#   distinct()
+
+# --- Check for missing data other than "cases_on_an_international_conveyance_Japan" ---
+if(covid %>% 
+  select(region, geoId, population, lat, long) %>% 
+  filter(is.na(population) | is.na(lat) | is.na(long), region != "Cases_on_an_international_conveyance_Japan") %>% 
+  distinct() %>% 
+  nrow() != 0L) stop("Missing data (coordinate or population)")
+```
+
+```{r WorldTotalTimeSeries}
+world_total <- covid %>% 
+  select(date, region, tot_cases, tot_deaths) %>% 
+  group_by(date) %>% 
+  summarise(Cases = sum(tot_cases, na.rm = TRUE), Fatalities = sum(tot_deaths, na.rm = TRUE)) %>% 
+  ungroup()
+```
+
+First, a simple interactive plot of confirmed cases and fatalities against time. It's important to remember that the data is for *confirmed* cases only. Due to limited testing the actual number of cases is considered to be much larger than the number of confirmed cases.
+
+```{r WorldTotalPlot}
+world_total_plot <- world_total %>%
+  pivot_longer(cols = c("Cases", "Fatalities"), names_to = "Type", values_to = "Confirmed") %>% 
+  rename("Date" = "date") %>% 
+  ggplot(aes(x = Date, y = Confirmed, colour = Type)) +
+    geom_line() +
+    geom_point() +
+    scale_color_manual(values = c("red", "black")) +
+    scale_y_continuous(labels = label_number_si()) +
+    xlab("Date") +
+    ylab("Confirmed Total") +
+    ggtitle("COVID-19 World Data")
+
+world_total_plot <- ggplotly(world_total_plot)
+
+frameWidget(world_total_plot)
+
+# world_total %>%
+#   pivot_longer(cols = c("cases", "Fatalities"), names_to = "Type", values_to = "cases") %>% 
+#   filter(cases > 0) %>% 
+#   ggplot(aes(x = date, y = cases, colour = Type)) +
+#     geom_line() +
+#     geom_point() +
+#     scale_color_manual(values = c("red", "black")) +
+#     scale_y_log10(labels = label_number_si()) +
+#     xlab("Date") +
+#     ylab("Confirmed Total") +
+#     ggtitle("COVID-19 World Data")
+
+# Make plotly?
+```
+
+```{r GetAnimPlots}
+world_map <- map_data("world") %>% as_tibble()
+
+max_3day_growth <- max(covid$past_3day_cases, na.rm = TRUE)
+N_breaks <- 5
+breaks <- seq(from = signif(max_3day_growth, 1)/N_breaks, to = signif(max_3day_growth, 1), length.out = N_breaks) %>% 
+  signif(digits = 2) %>% as.integer()
+
+plot_bubble <- function(in_date){
+  covid %>% 
+    filter(region != "Cases_on_an_international_conveyance_Japan", date == in_date, !is.na(past_3day_cases), past_3day_cases > 0) %>%  
+    ggplot() +
+      geom_polygon(data = world_map, aes(x = long, y = lat, group = group), fill = "grey80") +
+      geom_point(aes(x = long, y = lat, size = past_3day_cases, fill = past_3day_cases), alpha = 0.5, shape = 21, colour = "black") +
+      scale_size_continuous(range = c(0,14), limits = c(0, max_3day_growth), breaks = breaks,
+                            name = "cases") +
+      scale_fill_viridis_c(limits = c(0, max_3day_growth), option = "inferno", breaks = breaks,
+                           name = "cases") +
+      theme_void() +
+      theme(aspect.ratio = 1/2.36, # legend.position = "none", 
+            plot.margin = grid::unit(c(0,0,0,0), "mm"),
+            legend.position = c(0.09, 0.41),
+            legend.background = element_rect(fill = NA, colour = NA),
+            plot.title = element_text(hjust=0.2),
+            plot.subtitle = element_text(hjust=0.2),
+            plot.background = element_rect(fill = "grey95")) +
+      guides(fill = guide_legend()) +
+      labs(title = "Newly Confirmed COVID-19 Cases (Windowed Sum)",
+           subtitle = paste(as.character(as_date(in_date) - days(2)), "to", as.character(as_date(in_date))))
+  ggsave(stringr::str_glue("plots/{in_date}.png"), width = 2.12*5, height = 1.00*5)
+}
+
+dummy <- purrr::map(as.integer(min(covid$date)):as.integer(max(covid$date)), plot_bubble)
+rm(dummy)
+```
+```{r MakeAnimation, results="hide"}
+dims <- dim(readPNG(source = file.path("plots",dir("plots/"))[1]))[1:2]
+
+end_pause_time <- 2.5
+frame_delay <- 0.25
+
+frame_dirs <- file.path("plots", dir("plots/"))
+frame_dirs <- c(frame_dirs, 
+                rep(frame_dirs[length(frame_dirs)],
+                    times = round(end_pause_time/frame_delay)-1))
+
+gifski(png_files = frame_dirs, 
+       gif_file = "anim.gif",
+       width = dims[2], 
+       height = dims[1], 
+       delay = frame_delay)
+```
+
+Bubble plots have been popular to show the geographical spread. I wanted to visualise the spread of the disease with rate of new cases over time rather than just the total to date. Here is an animation of new confirmed cases against time and region. I used a rolling window to get 3-day sums to smooth out any daily jumps in the dataset caused by an artefact in the data collection process.
+
+```{r}
+knitr::include_graphics("anim.gif")
+```
+
+Finally an interactive choropleth map. Regions are coloured according to a quantile ranking of the number of confirmed cases per million population. Since countries differ in their attitudes and capabilities for testing, it is important to be cautious when making comparisons between countries.
+
+```{r MakeChoropleth}
+if(!file.exists("data/world_shape_file.zip")){
+  download.file("http://thematicmapping.org/downloads/TM_WORLD_BORDERS_SIMPL-0.3.zip" , destfile="data/world_shape_file.zip")
+  dir.create("data/world_shape_file/")
+  unzip("data/world_shape_file.zip", exdir = "data/world_shape_file")
+}
+
+world_spdf <- readOGR( 
+  dsn= paste0(getwd(),"/data/world_shape_file") , 
+  layer="TM_WORLD_BORDERS_SIMPL-0.3",
+  verbose=FALSE
+)
+
+world_spdf@data <- covid %>% 
+  filter(date == max(date), region != "Cases_on_an_international_conveyance_Japan") %>% 
+  right_join(world_spdf@data, by = c("geoId" = "ISO2"))
+
+text_popup <- paste("Country: ", world_spdf@data$NAME, "<br/>", 
+                    "Conf. cases: ", world_spdf@data$tot_cases, "<br/>", 
+                    "Conf. deaths: ", world_spdf@data$tot_deaths, "<br/>", 
+                    "Conf. cases p.million: ", round(world_spdf@data$tot_cases_per_million, 2), "<br/>",
+                    "Conf. deaths p.million: ", round(world_spdf@data$tot_deaths_per_million, 2), "<br/>",
+                    sep="") %>%
+  lapply(htmltools::HTML)
+
+m <- leaflet(world_spdf) %>% 
+  addTiles() %>% 
+  setView(lat=10, lng=0, zoom=2) %>%
+  addPolygons(fillOpacity = 0.8, 
+              color = ~colorQuantile("YlOrRd", tot_cases_per_million, n = 9)(tot_cases_per_million), 
+              stroke = FALSE,
+              label = text_popup,
+              labelOptions = labelOptions(style = list("font-weight" = "normal", padding = "3px 8px"), 
+                                          textsize = "13px", 
+                                          direction = "auto"))
+
+frameWidget(m)
+```
+
