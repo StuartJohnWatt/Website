@@ -246,9 +246,9 @@ plot_bubble <- function(in_date){
     ggplot() +
       geom_polygon(data = world_map, aes(x = long, y = lat, group = group), fill = "grey80") +
       geom_point(aes(x = long, y = lat, size = past_3day_cases, fill = past_3day_cases), alpha = 0.5, shape = 21, colour = "black") +
-      scale_size_continuous(range = c(0,14), limits = c(0, max_3day_growth), breaks = breaks,
+      scale_size_continuous(range = c(0,14), limits = c(0, max(breaks)), breaks = breaks,
                             name = "cases") +
-      scale_fill_viridis_c(limits = c(0, max_3day_growth), option = "inferno", breaks = breaks,
+      scale_fill_viridis_c(limits = c(0, max(breaks)), option = "inferno", breaks = breaks,
                            name = "cases") +
       theme_void() +
       theme(aspect.ratio = 1/2.36, # legend.position = "none", 
