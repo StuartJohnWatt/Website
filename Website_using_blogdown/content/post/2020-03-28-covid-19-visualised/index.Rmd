@@ -216,20 +216,6 @@ world_total_plot <- world_total %>%
 world_total_plot <- ggplotly(world_total_plot)
 
 frameWidget(world_total_plot)
-
-# world_total %>%
-#   pivot_longer(cols = c("cases", "Fatalities"), names_to = "Type", values_to = "cases") %>% 
-#   filter(cases > 0) %>% 
-#   ggplot(aes(x = date, y = cases, colour = Type)) +
-#     geom_line() +
-#     geom_point() +
-#     scale_color_manual(values = c("red", "black")) +
-#     scale_y_log10(labels = label_number_si()) +
-#     xlab("Date") +
-#     ylab("Confirmed Total") +
-#     ggtitle("COVID-19 World Data")
-
-# Make plotly?
 ```
 
 ```{r GetAnimPlots}
@@ -246,12 +232,12 @@ plot_bubble <- function(in_date){
     ggplot() +
       geom_polygon(data = world_map, aes(x = long, y = lat, group = group), fill = "grey80") +
       geom_point(aes(x = long, y = lat, size = past_3day_cases, fill = past_3day_cases), alpha = 0.5, shape = 21, colour = "black") +
-      scale_size_continuous(range = c(0,14), limits = c(0, max(breaks)), breaks = breaks,
+      scale_size_continuous(range = c(0,15), limits = c(0, max(max(breaks), max_3day_growth)), breaks = breaks,
                             name = "cases") +
-      scale_fill_viridis_c(limits = c(0, max(breaks)), option = "inferno", breaks = breaks,
+      scale_fill_viridis_c(limits = c(0, max(max(breaks), max_3day_growth)), option = "inferno", breaks = breaks,
                            name = "cases") +
       theme_void() +
-      theme(aspect.ratio = 1/2.36, # legend.position = "none", 
+      theme(aspect.ratio = 1/2.36,
             plot.margin = grid::unit(c(0,0,0,0), "mm"),
             legend.position = c(0.09, 0.41),
             legend.background = element_rect(fill = NA, colour = NA),
@@ -270,8 +256,8 @@ rm(dummy)
 ```{r MakeAnimation, results="hide"}
 dims <- dim(readPNG(source = file.path("plots",dir("plots/"))[1]))[1:2]
 
-end_pause_time <- 2.5
-frame_delay <- 0.25
+end_pause_time <- 3
+frame_delay <- 0.2
 
 frame_dirs <- file.path("plots", dir("plots/"))
 frame_dirs <- c(frame_dirs, 
