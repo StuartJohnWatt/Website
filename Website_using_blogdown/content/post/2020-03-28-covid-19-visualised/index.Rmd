@@ -92,7 +92,9 @@ covid <- get_data(data_path) %>%
   mutate_at(vars("geoId"), ~recode(., 
                                    "UK" = "GB", 
                                    "EL" = "GR",
-                                   "PYF" = "PF"))
+                                   "PYF" = "PF",
+                                   "BLM" = "BL",
+                                   "Saint Eustatius and Saba" = "BQ"))
 ```
 
 Note that I plan to update this page frequently to include recent data. This page currently has data up to `r as.character(max(covid$date))`.
@@ -156,7 +158,9 @@ missing_data <- tribble(
   "Netherlands_Antilles", 227049, 12.226079, -69.060087,
   "Taiwan", 23.6e6, 23.6978, 120.9605,
   "Anguilla", 15094, 18.2205544, -63.068615,
-  "Falkland_Islands_(Malvinas)", 3398, -51.7, -57.85
+  "Falkland_Islands_(Malvinas)", 3398, -51.7, -57.85,
+  "Bonaire", 25157, 12.201890, -68.262383,
+  "Saint_Barthelemy", 9793, 17.8999996, -62.8333321
 )
 
 covid <- covid %>% left_join(missing_data, by = c("region")) %>% 
