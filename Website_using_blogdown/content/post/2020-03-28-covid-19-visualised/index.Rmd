@@ -212,7 +212,7 @@ world_total_plot <- world_total %>%
     geom_line() +
     geom_point() +
     scale_color_manual(values = c("red", "black")) +
-    scale_y_continuous(labels = label_number_si()) +
+    scale_y_continuous(labels = label_number_si(accuracy = 0.1)) +
     xlab("Date") +
     ylab("Confirmed Total") +
     ggtitle("COVID-19 World Data")
