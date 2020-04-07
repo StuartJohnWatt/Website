@@ -305,8 +305,8 @@ world_spdf@data <- covid %>%
 text_popup <- paste("Country: ", world_spdf@data$NAME, "<br/>", 
                     "Conf. cases: ", world_spdf@data$tot_cases, "<br/>", 
                     "Conf. deaths: ", world_spdf@data$tot_deaths, "<br/>", 
-                    "Conf. cases p.million: ", round(world_spdf@data$tot_cases_per_million, 3), "<br/>",
-                    "Conf. deaths p.million: ", round(world_spdf@data$tot_deaths_per_million, 3), "<br/>",
+                    "Conf. cases p.million: ", round(world_spdf@data$tot_cases_per_million, 2), "<br/>",
+                    "Conf. deaths p.million: ", round(world_spdf@data$tot_deaths_per_million, 2), "<br/>",
                     sep="") %>%
   lapply(htmltools::HTML)
 
@@ -325,7 +325,7 @@ m <- leaflet(world_spdf) %>%
                                           direction = "auto"),
               group = "Cases") %>% 
   addPolygons(fillOpacity = 0.8, 
-              color = ~colMap_2(world_spdf$tot_deaths_per_million %>% log() %>% map_dbl(~ifelse(is.finite(.),.,))), 
+              color = ~colMap_2(world_spdf$tot_deaths_per_million %>% log() %>% map_dbl(~ifelse(is.finite(.x),.x,NA))), 
               stroke = FALSE,
               label = text_popup,
               labelOptions = labelOptions(style = list("font-weight" = "normal", padding = "3px 8px"), 
