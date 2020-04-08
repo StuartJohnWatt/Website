@@ -215,7 +215,8 @@ world_total_plot <- world_total %>%
     scale_y_continuous(labels = label_number_si(accuracy = 0.1)) +
     xlab("Date") +
     ylab("Confirmed Total") +
-    ggtitle("COVID-19 World Data")
+    ggtitle("COVID-19 World Data") +
+    theme(legend.position = c(0.2, 0.8))
 
 world_total_plot <- ggplotly(world_total_plot)
 
@@ -237,9 +238,9 @@ plot_bubble <- function(in_date){
       geom_polygon(data = world_map, aes(x = long, y = lat, group = group), fill = "grey80") +
       geom_point(aes(x = long, y = lat, size = past_3day_cases, fill = past_3day_cases), alpha = 0.5, shape = 21, colour = "black") +
       scale_size_continuous(range = c(0,15), limits = c(0, max(max(breaks), max_3day_growth)), breaks = breaks,
-                            name = "cases") +
+                            name = "cases", labels = label_number_si(accuracy = 0.2)) +
       scale_fill_viridis_c(limits = c(0, max(max(breaks), max_3day_growth)), option = "inferno", breaks = breaks,
-                           name = "cases") +
+                           name = "cases", labels = label_number_si(accuracy = 0.2)) +
       theme_void() +
       theme(aspect.ratio = 1/2.36,
             plot.margin = grid::unit(c(0,0,0,0), "mm"),
