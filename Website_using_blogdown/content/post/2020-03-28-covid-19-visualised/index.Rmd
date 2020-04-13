@@ -131,10 +131,10 @@ position_data <- wbcountries() %>%
 country_data <- left_join(pop_data, position_data, c("iso3c", "iso2c", "country"))
 
 # Complete missing data. Good website: https://gps-coordinates.org
-country_data[country_data$country == "Gibraltar", c("long", "lat")] <- c(36.1408, 5.3536)
-country_data[country_data$country == "West Bank and Gaza", c("long", "lat")] <- c(35.3027, 31.9466)
-country_data[country_data$country == "Curacao", c("long", "lat")] <- c(-68.981745, 12.178308)
-country_data[country_data$country == "Sint Maarten (Dutch part)", c("long", "lat")] <- c(-63.049271, 18.025281)
+country_data[country_data$country == "Gibraltar", c("long", "lat")] <- tibble("long" = 36.1408, "lat" = 5.3536)
+country_data[country_data$country == "West Bank and Gaza", c("long", "lat")] <- tibble("long" = 35.3027, "lat" = 31.9466)
+country_data[country_data$country == "Curacao", c("long", "lat")] <- tibble("long" = -68.981745, "lat" = 12.178308)
+country_data[country_data$country == "Sint Maarten (Dutch part)", c("long", "lat")] <- tibble("long" = -63.049271, "lat" = 18.025281)
 
 # Check data
 if ((country_data %>% group_by(country, iso3c, iso2c) %>% tally %>% filter(n > 1) %>% nrow()) != 0) stop("Non-unique country data")
