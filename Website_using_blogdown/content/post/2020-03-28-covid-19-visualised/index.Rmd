@@ -190,7 +190,7 @@ covid <- covid %>% left_join(missing_data, by = c("region")) %>%
 if(covid %>% 
   select(region, geoId, population, lat, long) %>% 
   filter(is.na(population) | is.na(lat) | is.na(long), region != "Cases_on_an_international_conveyance_Japan") %>% 
-  distinct() %>% 
+  distinct() %>%
   nrow() != 0L) stop("Missing data (coordinate or population)")
 ```
 
