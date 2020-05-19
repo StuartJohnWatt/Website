@@ -211,7 +211,7 @@ world_total_plot <- world_total %>%
   rename("Date" = "date") %>% 
   ggplot(aes(x = Date, y = Confirmed, colour = Type)) +
     geom_line() +
-    geom_point() +
+    #geom_point() +
     scale_color_manual(values = c("red", "black")) +
     scale_y_continuous(labels = label_number_si(accuracy = 0.1)) +
     xlab("Date") +
