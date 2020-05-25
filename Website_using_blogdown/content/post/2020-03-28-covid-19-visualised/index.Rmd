@@ -198,7 +198,7 @@ if(covid %>%
 ```{r WorldTotalTimeSeries}
 world_total <- covid %>% 
   select(date, region, tot_cases, tot_deaths) %>% 
-  group_by(date) %>% 
+  group_by(date) %>%
   summarise(Cases = sum(tot_cases, na.rm = TRUE), Fatalities = sum(tot_deaths, na.rm = TRUE)) %>% 
   ungroup()
 ```
