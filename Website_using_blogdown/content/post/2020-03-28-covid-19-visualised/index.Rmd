@@ -300,9 +300,9 @@ world_spdf <- readOGR(
   verbose=FALSE
 )
 
-world_spdf@data <- covid %>% 
-  filter(date == max(date), region != "Cases_on_an_international_conveyance_Japan") %>% 
-  right_join(world_spdf@data, by = c("geoId" = "ISO2"))
+world_spdf@data <- world_spdf@data %>% 
+  left_join(filter(covid, date == max(date), region != "Cases_on_an_international_conveyance_Japan"),
+            by = c("ISO3" = "iso3c"))
 
 text_popup <- paste("Country: ", world_spdf@data$NAME, "<br/>", 
                     "Conf. cases: ", world_spdf@data$tot_cases, "<br/>", 
